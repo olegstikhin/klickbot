@@ -1,6 +1,6 @@
 const TelegramBot = require('node-telegram-bot-api');
 const fs = require('fs');
-const token = require('token.js');
+const token = require('./token.js');
 
 let state = require('./stats.json');
 let chats = require('./chats.json');
@@ -20,6 +20,11 @@ bot.onText(/\/klick/, (msg, match) => {
   } else {
 	bot.sendMessage(chatId, "Fel: Inget meddelande har mottagits!");
   } 
+});
+
+bot.onText(/\/gdpr/, (msg, match) => {
+  const chatId = msg.chat.id;
+  bot.sendMessage(chatId, "Allmän dataskyddsförordning, Artikel 2.2 c: Denna förordning ska inte tillämpas på behandling av personuppgifter som en fysisk person utför som ett led i verksamhet av rent privat natur eller som har samband med hans eller hennes hushåll.");
 });
 
 bot.on('message', (msg) => {
