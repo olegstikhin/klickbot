@@ -65,7 +65,10 @@ bot.onText(/\/gdpr/, (msg, match) => {
 });
 
 bot.on('message', (msg) => {
-  if (msg.entities) return;
+  if (msg.entities) {
+	// Ignore bot commands
+	if (msg.entities.find(member => {return member.type == "bot_command"})) return;
+  }
   if (msg.text && !msg.from.is_bot && msg.chat.type != "private") {
     if (msg.from.first_name.length > 0) {
 	  chats[msg.chat.id] = [msg.from.id, msg.from.first_name];
