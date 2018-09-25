@@ -9,29 +9,66 @@ const bot = new TelegramBot(token, {polling: true});
 
 bot.onText(/\/klick/, (msg, match) => {
   const chatId = msg.chat.id;
+  let userObj;
+  // Checks whether a message has been received from this chat
   if (chats[chatId]) {
-	if (state[chats[chatId]]) {
-	  state[chats[chatId]]++;
-	} else {
-	  state[chats[chatId]] = 1;
+	// Find the user's record, if any
+	userObj = state.user.find(member => {return member.id == chats[chatId][0]});
+	if (!userObj) {
+	  // If the id has not been found, try name
+	  userObj = state.user.find(member => {return member.name == chats[chatId][1]});
+	  if (userObj) {
+	    // If the user is found by name, store their id
+		userObj.id = chats[chatId][0];
+	  }
+	}
+	if (userObj) {
+	  // If the user has been found, increment the count by 1
+	  userObj.count++;
+	}
+	else {
+	// Otherwise, create a new user and initialize their count with 1
+	  newUser = {}
+	  newUser.id = chats[chatId][0];
+	  newUser.name = chats[chatId][1];
+	  newUser.count = 1;
+	  state.user.push(newUser);
 	}
 	fs.writeFileSync('stats.json', JSON.stringify(state));
-	bot.sendMessage(chatId, "Klicken har registrerats. " + (chats[chatId].endsWith("s") ? chats[chatId] : chats[chatId] + "s") + " klicks: " + state[chats[chatId]]);
+	bot.sendMessage(chatId, "Klicken har registrerats. " + (userObj.name.endsWith("s") ? userObj.name : userObj.name + "s") + " klicks: " + userObj.count);
   } else {
+	// Nothing to click
 	bot.sendMessage(chatId, "Fel: Inget meddelande har mottagits!");
   } 
 });
 
+
+bot.onText(/\/resultat/, (msg, match) => {
+  const chatId = msg.chat.id;
+  let resultStr = "*Resultat*\n";
+  
+  state.user.sort(function(a, b) {
+	return parseInt(b.count - a.count);
+  });
+  state.user.forEach(function(member) {
+	resultStr += member.name + ": " + member.count + "\n";
+  });
+  bot.sendMessage(chatId, resultStr, {parse_mode: "Markdown"});
+});
+
 bot.onText(/\/gdpr/, (msg, match) => {
   const chatId = msg.chat.id;
-  bot.sendMessage(chatId, "Allmän dataskyddsförordning, Artikel 2.2 c: Denna förordning ska inte tillämpas på behandling av personuppgifter som en fysisk person utför som ett led i verksamhet av rent privat natur eller som har samband med hans eller hennes hushåll.");
+  bot.sendMessage(chatId, "Allmän dataskyddsförordning, Artikel 2.2 c:" +
+						  "Denna förordning ska inte tillämpas på behandling av personuppgifter " +
+						  "som en fysisk person utför som ett led i verksamhet av rent privat " +
+						  "natur eller som har samband med hans eller hennes hushåll.");
 });
 
 bot.on('message', (msg) => {
   if (msg.entities) return;
   if (msg.text && !msg.from.is_bot && msg.chat.type != "private") {
     if (msg.from.first_name.length > 0) {
-	  chats[msg.chat.id] = msg.from.first_name;
+	  chats[msg.chat.id] = [msg.from.id, msg.from.first_name];
 	  fs.writeFileSync('chats.json', JSON.stringify(chats));
     }
   }
