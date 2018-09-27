@@ -34,7 +34,7 @@ bot.onText(/\/klick/, (msg, match) => {
       state.user.push(newUser);
     }
     fs.writeFileSync('stats.json', JSON.stringify(state));
-    bot.sendMessage(chatId, `Klicken har registrerats. ${userObj.name.endsWith('s') ? userObj.name : userObj.name}s klicks: ${userObj.count}`);
+    bot.sendMessage(chatId, `Klicken har registrerats. ${userObj.name}${userObj.name.endsWith('s') ? '' : 's'} klicks: ${userObj.count}`);
   } else {
     // Nothing to click
     bot.sendMessage(chatId, 'Fel: Inget meddelande har mottagits!');
