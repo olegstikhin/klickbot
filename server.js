@@ -14,14 +14,6 @@ bot.onText(/\/klick/, (msg, match) => {
   if (chats[chatId]) {
     // Find the user's record, if any
     userObj = state.user.find(member => member.id === chats[chatId][0]);
-    if (!userObj) {
-      // If the id has not been found, try name
-      userObj = state.user.find(member => member.name === chats[chatId][1]);
-      if (userObj) {
-        // If the user is found by name, store their id
-        userObj.id = chats[chatId][0];
-      }
-    }
     if (userObj) {
       // If the user has been found, increment the count by 1
       userObj.count += 1;
