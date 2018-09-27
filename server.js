@@ -32,6 +32,7 @@ bot.onText(/\/klick/, (msg, match) => {
       newUser.name = chats[chatId][1];
       newUser.count = 1;
       state.user.push(newUser);
+      userObj = newUser;
     }
     fs.writeFileSync('stats.json', JSON.stringify(state));
     bot.sendMessage(chatId, `Klicken har registrerats. ${userObj.name}${userObj.name.endsWith('s') ? '' : 's'} klicks: ${userObj.count}`);
@@ -46,7 +47,7 @@ bot.onText(/\/resultat/, (msg, match) => {
   let resultStr = '*Resultat*\n';
 
   state.user.sort((a, b) => parseInt(b.count, 10) - parseInt(a.count, 10));
-  state.user.forEach((member) => { resultStr += `${member.name}: ${member.count} \n`; });
+  state.user.forEach((member) => { resultStr += `${member.name}: ${member.count}\n`; });
   bot.sendMessage(chatId, resultStr, { parse_mode: 'Markdown' });
 });
 
