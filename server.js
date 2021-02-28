@@ -18,7 +18,7 @@ bot.onText(/\/klick/, (msg, match) => {
       // If the user has been found, increment the count by 1
       userObj.count += 1;
     } else {
-    // Otherwise, create a new user and initialize their count with 1
+      // Otherwise, create a new user and initialize their count with 1
       const newUser = {};
       newUser.id = chats[chatId][0];
       newUser.name = chats[chatId][1];
@@ -46,20 +46,26 @@ bot.onText(/\/resultat/, (msg, match) => {
 bot.onText(/\/gdpr/, (msg, match) => {
   const chatId = msg.chat.id;
   bot.sendMessage(chatId, 'Allmän dataskyddsförordning, Artikel 2.2 c:'
-                        + 'Denna förordning ska inte tillämpas på behandling av personuppgifter '
-                        + 'som en fysisk person utför som ett led i verksamhet av rent privat '
-                        + 'natur eller som har samband med hans eller hennes hushåll.');
+    + 'Denna förordning ska inte tillämpas på behandling av personuppgifter '
+    + 'som en fysisk person utför som ett led i verksamhet av rent privat '
+    + 'natur eller som har samband med hans eller hennes hushåll.');
 });
 
 bot.on('message', (msg) => {
-  if (msg.entities) {
-    // Ignore bot commands
-    if (msg.entities.find(member => member.type === 'bot_command')) return;
-  }
-  if (msg.text && !msg.from.is_bot && msg.chat.type !== 'private') {
-    if (msg.from.first_name.length > 0) {
-      chats[msg.chat.id] = [msg.from.id, msg.from.first_name];
-      fs.writeFileSync('chats.json', JSON.stringify(chats));
+  if (chats[msg.chat.id]) {
+    // Limits the bot's functionality to predefined chats
+    if (msg.entities) {
+      // Ignore bot commands
+      if (msg.entities.find(member => member.type === 'bot_command')) return;
     }
+    if (msg.text && !msg.from.is_bot && msg.chat.type !== 'private') {
+      if (msg.from.first_name.length > 0) {
+        chats[msg.chat.id] = [msg.from.id, msg.from.first_name];
+        fs.writeFileSync('chats.json', JSON.stringify(chats));
+      }
+    }
+  } else {
+    // If the chat is not supported, leave it at first received message
+    bot.leaveChat(msg.chat.id);
   }
 });
