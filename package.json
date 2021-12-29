@@ -4,8 +4,8 @@
   "description": "The bot to klick",
   "main": "server.js",
   "dependencies": {
-    "node-telegram-bot-api": "^0.30.0",
-    "pm2": "^4.5.5"
+    "node-telegram-bot-api": "^0.56.0",
+    "pm2": "^5.1.2"
   },
   "devDependencies": {},
   "scripts": {
